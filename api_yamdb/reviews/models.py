@@ -12,6 +12,7 @@ class User(AbstractUser):
         ('SUDJANGO', 'Superuser')
     )
 
+    email = models.EmailField(max_length=200, unique=True)
     bio = models.TextField(
         'Биография',
         blank=True,
