@@ -1,8 +1,24 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-class Category(models.Model):
+class User(AbstractUser):
 
-    name = models.CharField(max_length=200),
-    slug = models.SlugField(max_length=200, unique=True)
+    ROLES = (
+        ('ANON', 'Anonymous'),
+        ('USER', 'User'),
+        ('MODER', 'Moderator'),
+        ('ADMIN', 'Administrator'),
+        ('SUDJANGO', 'Superuser')
+    )
 
+    bio = models.TextField(
+        'Биография',
+        blank=True,
+        null=True,
+    )
+    role = models.CharField(
+        max_length=16,
+        choices=ROLES,
+        default='USER'
+    )
