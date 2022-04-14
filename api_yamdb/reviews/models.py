@@ -93,11 +93,15 @@ class User(AbstractUser):
 
  
 class Review(models.Model):
+    scores = (
+        ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),
+        ('6', '6'), ('7', '7'), ('8', '8'), ('9', '9'), ('10', '10')
+    )
     title = models.ForeignKey(Title, on_delete=models.CASCADE, related_name='reviews')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
-    score = models.IntegerChoices('Оценка', '1 2 3 4 5 6 7 8 9 10')
+    score = models.IntegerField(choices=scores)
     
     def __str__(self):
         return self.text
