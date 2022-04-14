@@ -22,7 +22,6 @@ class UserViewSet(ModelViewSet):
     permission_classes = [IsAdmin]
 
     def retrieve(self, request, *args, **kwargs):
-        print('\n\nsss ', request.user)
         if request.META['PATH_INFO'].endswith(r'users/me/'):
             instance = get_object_or_404(User, pk=request.user.pk)
         else:
