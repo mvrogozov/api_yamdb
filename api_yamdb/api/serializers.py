@@ -1,7 +1,7 @@
 from email.policy import default
 from rest_framework import serializers
-from reviews.models import User
-
+from reviews.models import User, Review, Comment
+from rest_framework.relations import SlugRelatedField
 
 class AuthSerializer(serializers.ModelSerializer):
 
@@ -38,3 +38,21 @@ class UserSerializer(serializers.ModelSerializer):
                 'Нельзя использовать зарезервированное имя \'me\''
             )
         return value
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(
+        read_only=True, slug_field='author')
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        model = Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(
+        read_only=True, slug_field='author')
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'pub_date')
+        model = Comment
