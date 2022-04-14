@@ -1,3 +1,4 @@
+from functools import partial
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import CreateAPIView
 from reviews.models import User
@@ -21,12 +22,22 @@ class UserViewSet(ModelViewSet):
     permission_classes = [IsAdmin]
 
     def retrieve(self, request, *args, **kwargs):
-        print('vvv', request.META['PATH_INFO'])
+        print('\n\nsss ', request.user)
         if request.META['PATH_INFO'].endswith(r'users/me/'):
-            print('ddd')
-        instance = get_object_or_404(User, pk=request.user.pk)
-        print('\n\nbbb', type(instance))
+            instance = get_object_or_404(User, pk=request.user.pk)
+        else:
+            instance = self.get_object()
         serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        if request.META['PATH_INFO'].endswith(r'users/me/'):
+            instance = get_object_or_404(User, pk=request.user.pk)
+        else:
+            instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
