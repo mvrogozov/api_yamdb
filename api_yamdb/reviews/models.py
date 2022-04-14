@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.forms import ValidationError
+from django.db.models import CheckConstraint, Q, F
 
 
 class User(AbstractUser):
@@ -41,7 +43,16 @@ class User(AbstractUser):
         null=True,
     )
     role = models.CharField(
-        max_length=16,
+        max_length=21,
         choices=ROLES,
+        blank=True,
         default='user'
     )
+
+    class Meta:
+        constraints = [
+            CheckConstraint(
+                check=~Q(username='me'),
+                name='name_not_me'
+            )
+        ]

@@ -20,6 +20,16 @@ class UserViewSet(ModelViewSet):
     lookup_field = 'username'
     permission_classes = [IsAdmin]
 
+    def retrieve(self, request, *args, **kwargs):
+        print('vvv', request.META['PATH_INFO'])
+        if request.META['PATH_INFO'].endswith(r'users/me/'):
+            print('ddd')
+        instance = get_object_or_404(User, pk=request.user.pk)
+        print('\n\nbbb', type(instance))
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 class AuthView(APIView):
 

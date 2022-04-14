@@ -1,3 +1,4 @@
+from email.policy import default
 from rest_framework import serializers
 from reviews.models import User
 
@@ -8,6 +9,14 @@ class AuthSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email')
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Нельзя использовать зарезервированное имя \'me\''
+            )
+        return value
+
+
 
 class AuthTokenSerializer(serializers.Serializer):
 
@@ -17,6 +26,15 @@ class AuthTokenSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
+    role = serializers.ChoiceField(choices=User.ROLES, default='user')
+
     class Meta:
         model = User
         fields = '__all__'
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Нельзя использовать зарезервированное имя \'me\''
+            )
+        return value
