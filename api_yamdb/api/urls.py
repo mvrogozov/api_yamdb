@@ -7,6 +7,7 @@ API_VERSION = 'v1/'
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet, basename='api_users')
+#router.register(r'users\/(?P<username>\w+)', SingleUserViewSet, basename='api_single_user')
 
 urlpatterns = [
     path(

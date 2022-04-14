@@ -5,14 +5,36 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
 
     ROLES = (
-        ('ANON', 'Anonymous'),
-        ('USER', 'User'),
-        ('MODER', 'Moderator'),
-        ('ADMIN', 'Administrator'),
-        ('SUDJANGO', 'Superuser')
+        ('user', 'User'),
+        ('moderator', 'Moderator'),
+        ('admin', 'Administrator'),
+        ('superuser', 'Superuser')
     )
 
-    email = models.EmailField(max_length=200, unique=True)
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+    )
+    first_name = models.CharField(
+        max_length=150,
+        unique=False,
+        blank=True,
+        null=True
+    )
+    last_name = models.CharField(
+        max_length=150,
+        unique=False,
+        blank=True,
+        null=True
+    )
+
+    email = models.EmailField(max_length=254, unique=True)
+    password = models.CharField(
+        max_length=150,
+        unique=False,
+        blank=True,
+        null=True
+    )
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -21,5 +43,5 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=16,
         choices=ROLES,
-        default='USER'
+        default='user'
     )

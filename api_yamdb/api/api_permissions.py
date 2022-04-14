@@ -12,8 +12,10 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         )
 
 
-class PostOnly(permissions.BasePermission):
+class IsAdmin(permissions.BasePermission):
 
+    message = 'Нет прав доступа к этому ресурсу'
 
-    def has_object_permission(self, request, view, obj):
-        return request.method == 'POST'
+    def has_permission(self, request, obj):
+        return request.user.role == 'admin'
+    

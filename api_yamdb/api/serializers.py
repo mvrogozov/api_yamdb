@@ -13,3 +13,10 @@ class AuthTokenSerializer(serializers.Serializer):
 
     username = serializers.CharField(max_length=200)
     confirmation_code = serializers.CharField(max_length=200)
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = '__all__'
