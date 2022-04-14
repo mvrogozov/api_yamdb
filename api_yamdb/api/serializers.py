@@ -1,7 +1,32 @@
+
+
+from reviews.models import Title, Category, Genre
+
 from email.policy import default
 from rest_framework import serializers
 from reviews.models import User, Review, Comment
 from rest_framework.relations import SlugRelatedField
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("name", "slug")
+        model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("name", "slug")
+        model = Genre
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        fields = "__all__"
+        model = Title
+
 
 class AuthSerializer(serializers.ModelSerializer):
 
@@ -56,3 +81,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
+
