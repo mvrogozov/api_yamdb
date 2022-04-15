@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import User
+from .models import User
 
 ROLES = (
         ('user', 'User'),

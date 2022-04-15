@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'reviews',
     'api',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -65,7 +66,7 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = 'reviews.User'
+AUTH_USER_MODEL = 'users.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

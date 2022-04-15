@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from .views import AuthTokenView, AuthView, MeView, UserViewSet
+from users.views import AuthTokenView, AuthView, MeView, UserViewSet
 
 API_VERSION = 'v1/'
 

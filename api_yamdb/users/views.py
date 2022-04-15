@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from reviews.models import User
+from .models import User
 
 from .api_permissions import IsAdmin
 from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
