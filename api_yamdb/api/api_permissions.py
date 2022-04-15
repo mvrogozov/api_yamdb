@@ -3,30 +3,31 @@ from rest_framework import permissions
 
 class IsOwnerU(permissions.BasePermission):
 
-    message = 'Доступ для владельца'
-
-
     def has_permission(self, request, view):
-        if view.action in ['list', 'destroy', 'create']:
+        if view.action in ['list', 'create']:
             if request.user.is_anonymous:
                 return False
-            return request.user.role == 'admin'
-        
+            return request.user.role == 'admin' or request.user.is_superuser
+        return True
 
     def has_object_permission(self, request, view, obj):
         return (
-            view.action in ['retrieve', 'update', 'partial_update']
-            and obj.username == request.user.username
+            view.action in ['retrieve', 'partial_update']
+            and (
+                obj.username == request.user.username
+                or request.user.role == 'admin'
+                or request.user.is_superuser
+            )
+        ) or (
+            view.action == 'destroy'
+            and (
+                request.user.role == 'admin'
+                or request.user.is_superuser
+            )
         )
-        '''return (
-            obj.username == request.user.username
-            and request.action == 'delete'
-        )'''
 
 
 class IsAdmin(permissions.BasePermission):
-
-    message = 'Нет прав доступа к этому ресурсу'
 
     def has_permission(self, request, obj):
         if request.user.is_anonymous:
