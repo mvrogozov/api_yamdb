@@ -1,12 +1,18 @@
-from email import message
 from rest_framework import permissions
-from django.contrib.auth.models import AnonymousUser
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
+
 
 class IsOwnerU(permissions.BasePermission):
 
     message = 'Доступ для владельца'
+
+
+    def has_permission(self, request, view):
+        if view.action in ['list', 'destroy', 'create']:
+            if request.user.is_anonymous:
+                return False
+            return request.user.role == 'admin'
+        
+
     def has_object_permission(self, request, view, obj):
         return (
             view.action in ['retrieve', 'update', 'partial_update']
@@ -16,7 +22,6 @@ class IsOwnerU(permissions.BasePermission):
             obj.username == request.user.username
             and request.action == 'delete'
         )'''
-        #and request.method in ('PATCH', 'PUT',)
 
 
 class IsAdmin(permissions.BasePermission):
