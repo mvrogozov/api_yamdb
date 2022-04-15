@@ -1,24 +1,26 @@
-from django.shortcuts import get_object_or_404
-from reviews.models import User
-from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
-from .api_permissions import IsOwnerU
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status, filters
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from rest_framework import filters, status
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from reviews.models import User
+
+from .api_permissions import IsAdmin
+from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
 
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    permission_classes = [IsAuthenticated & IsOwnerU]
+    permission_classes = [IsAuthenticated & IsAdmin]
     pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = (
@@ -28,34 +30,28 @@ class UserViewSet(ModelViewSet):
         'role'
     )
 
-    def retrieve(self, request, *args, **kwargs):
-        if request.META['PATH_INFO'].endswith(r'users/me/'):
-            instance = get_object_or_404(User, pk=request.user.pk)
-        else:
-            instance = self.get_object()
-        serializer = UserSerializer(instance)
+
+class MeView(APIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = get_object_or_404(User, username=request.user.username)
+        serializer = UserSerializer(instance=user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def partial_update(self, request, *args, **kwargs):
-        if request.META['PATH_INFO'].endswith(r'users/me/'):
-            instance = get_object_or_404(User, pk=request.user.pk)
-        else:
-            instance = self.get_object()
-
-        serializer = UserSerializer(instance, data=request.data, partial=True)
-
-        if request.user.role == 'admin' or request.user.is_superuser:
-            if serializer.is_valid(raise_exception=True):
+    def patch(self, request):
+        user = get_object_or_404(User, username=request.user.username)
+        serializer = UserSerializer(
+            instance=user, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            if request.user.is_superuser or request.user.role == 'admin':
                 serializer.save()
-        else:
-            if serializer.is_valid(raise_exception=True):
+            else:
                 serializer.save(role=request.user.role)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def destroy(self, request, *args, **kwargs):
-        if request.META['PATH_INFO'].endswith(r'users/me/'):
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        return super().destroy(request, *args, **kwargs)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AuthView(APIView):

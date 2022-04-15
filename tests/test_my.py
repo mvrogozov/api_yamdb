@@ -1,3 +1,5 @@
+
+  
 import pytest
 from django.contrib.auth import get_user_model
 
@@ -361,7 +363,6 @@ class Test01UserAPI:
             'bio': 'new user bio'
         }
         response = moderator_client.patch(f'/api/v1/users/{user.username}/', data=data)
-        print('moder username=', user.username, '  request.user.username= ', response.wsgi_request.user)
         assert response.status_code == 403, (
             'Проверьте, что при PATCH запросе `/api/v1/users/{username}/` '
             'пользователь с ролью moderator не может изменять данные других пользователей'
@@ -375,7 +376,6 @@ class Test01UserAPI:
             'bio': 'new user bio'
         }
         response = user_client.patch(f'/api/v1/users/{user.username}/', data=data)
-        print('username=', user.username, '  request.user.username= ', response.wsgi_request.user)
         assert response.status_code == 403, (
             'Проверьте, что при PATCH запросе `/api/v1/users/{username}/` '
             'пользователь с ролью user не может изменять данные других пользователей'
