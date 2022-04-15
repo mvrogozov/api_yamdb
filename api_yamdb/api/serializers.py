@@ -3,6 +3,13 @@ from rest_framework import serializers
 from reviews.models import User
 
 
+ROLES = (
+        ('user', 'User'),
+        ('moderator', 'Moderator'),
+        ('admin', 'Administrator'),
+        ('superuser', 'Superuser')
+    )
+
 class AuthSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -24,13 +31,20 @@ class AuthTokenSerializer(serializers.Serializer):
     confirmation_code = serializers.CharField(max_length=200)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class AdminSerializer(serializers.ModelSerializer):
 
-    role = serializers.ChoiceField(choices=User.ROLES, default='user')
+    role = serializers.ChoiceField(choices=ROLES, default='user')
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'role',
+            'bio'
+        )
 
     def validate_username(self, value):
         if value == 'me':
@@ -38,3 +52,19 @@ class UserSerializer(serializers.ModelSerializer):
                 'Нельзя использовать зарезервированное имя \'me\''
             )
         return value
+
+
+class UserSerializer(AdminSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
+        read_only_fields = ('role',)
+    

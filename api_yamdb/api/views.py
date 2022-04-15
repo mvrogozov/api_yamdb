@@ -1,9 +1,8 @@
-from functools import partial
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import CreateAPIView
 from reviews.models import User
-from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
-from .api_permissions import IsAdmin
+from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer, AdminSerializer
+from .api_permissions import IsAdmin, IsOwnerU
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
@@ -12,21 +11,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
 
 
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'username'
-    permission_classes = [IsAdmin]
+    permission_classes = [(IsAdmin | IsOwnerU) & IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
+        print('\n\nlll ', self)
         if request.META['PATH_INFO'].endswith(r'users/me/'):
             instance = get_object_or_404(User, pk=request.user.pk)
         else:
             instance = self.get_object()
-        serializer = self.get_serializer(instance)
+        serializer = UserSerializer(instance)#
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
@@ -34,8 +34,11 @@ class UserViewSet(ModelViewSet):
             instance = get_object_or_404(User, pk=request.user.pk)
         else:
             instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        if serializer.is_valid():
+        if request.user.role == 'admin':
+            serializer = AdminSerializer(instance, data=request.data, partial=True)
+        else:
+            serializer = UserSerializer(instance, data=request.data, partial=True) #self.get_serializer
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
