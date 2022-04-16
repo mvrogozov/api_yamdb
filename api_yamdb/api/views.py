@@ -6,17 +6,15 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.generics import CreateAPIView
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Genre, Review, Title, User
 
+from reviews.models import Category, Genre, Review, Title, User
 from .api_permissions import IsAdmin, ReadOnly
+from .filters import TitleFilter
 from .serializers import (
     AuthSerializer,
     AuthTokenSerializer,
@@ -24,7 +22,8 @@ from .serializers import (
     CommentSerializer,
     GenreSerializer,
     ReviewSerializer,
-    TitleSerializer,
+    TitleSerializerEdit,
+    TitleSerializerSafe,
     UserSerializer,
 )
 
@@ -166,10 +165,16 @@ class GenreViewSet(ListCreateDestroyViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdmin]
+    filterset_class = TitleFilter
+    permission_classes = [IsAdmin]
+    filter_backends = [DjangoFilterBackend]
 
     def get_permissions(self):
-        if self.action == "list":
+        if self.action in ["list", "retrieve"]:
             return (ReadOnly(),)
         return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action in ["post", "create", "partial_update"]:
+            return TitleSerializerEdit
+        return TitleSerializerSafe
