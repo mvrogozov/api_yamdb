@@ -1,8 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.db.models import CheckConstraint, F, Q
 from django.forms import ValidationError
-from django.db.models import CheckConstraint, Q, F
-
 
 
 class Category(models.Model):
