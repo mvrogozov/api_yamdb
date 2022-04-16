@@ -16,7 +16,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Genre, Review, Title, User
 
-from .api_permissions import IsAdmin
+from .api_permissions import IsAdmin, ReadOnly
 from .serializers import (
     AuthSerializer,
     AuthTokenSerializer,
@@ -142,18 +142,34 @@ class CategoryViewSet(ListCreateDestroyViewSet):
         filters.SearchFilter,
     )
     search_fields = ("name",)
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdmin]
+    permission_classes = [IsAdmin]
+
+    def get_permissions(self):
+        if self.action == "list":
+            return (ReadOnly(),)
+        return super().get_permissions()
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdmin]
+    permission_classes = [IsAdmin]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = "slug"
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
+    def get_permissions(self):
+        if self.action == "list":
+            return (ReadOnly(),)
+        return super().get_permissions()
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdmin]
+
+    def get_permissions(self):
+        if self.action == "list":
+            return (ReadOnly(),)
+        return super().get_permissions()
