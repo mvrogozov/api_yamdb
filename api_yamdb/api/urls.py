@@ -1,10 +1,9 @@
 from django.urls import include, path
 from rest_framework import routers
 
+from reviews.views import (CategoryViewSet, CommentViewSet, GenreViewSet,
+                           ReviewViewSet, TitleViewSet)
 from users.views import AuthTokenView, AuthView, MeView, UserViewSet
-from users.views import (
-    CategoryViewSet, CommentViewSet, GenreViewSet, ReviewViewSet, TitleViewSet,
-)
 
 API_VERSION = 'v1/'
 
