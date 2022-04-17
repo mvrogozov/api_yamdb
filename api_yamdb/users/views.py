@@ -10,9 +10,9 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
+from api.api_permissions import IsAdmin
 
-from .api_permissions import IsAdmin
+from .models import User
 from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
 
 
@@ -32,7 +32,6 @@ class UserViewSet(ModelViewSet):
 
 
 class MeView(APIView):
-
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -55,19 +54,18 @@ class MeView(APIView):
 
 
 class AuthView(APIView):
-
     def post(self, request):
         serializer = AuthSerializer(data=request.data)
         if serializer.is_valid():
             confirmation_code = urlsafe_base64_encode(
-                force_bytes(serializer.validated_data.get('username'))
+                force_bytes(serializer.validated_data.get("username"))
             )
             send_mail(
-                'subj',
+                "subj",
                 confirmation_code,
-                'from@django.com',
-                [serializer.validated_data.get('email')],
-                fail_silently=True
+                "from@django.com",
+                [serializer.validated_data.get("email")],
+                fail_silently=True,
             )
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -75,7 +73,6 @@ class AuthView(APIView):
 
 
 class AuthTokenView(APIView):
-
     def post(self, request):
         serializer = AuthTokenSerializer(data=request.data)
         if not serializer.is_valid():
@@ -84,16 +81,13 @@ class AuthTokenView(APIView):
             )
         username = serializer.data.get('username')
         user = get_object_or_404(User, username=username)
-        right_code = urlsafe_base64_encode(
-            force_bytes(username))
-        if serializer.data.get('confirmation_code') != right_code:
+        right_code = urlsafe_base64_encode(force_bytes(username))
+        if serializer.data.get("confirmation_code") != right_code:
             return Response(
-                serializer.data,
-                status=status.HTTP_400_BAD_REQUEST
+                serializer.data, status=status.HTTP_400_BAD_REQUEST
             )
 
         refresh = RefreshToken.for_user(user)
         return Response(
-            {'access': str(refresh.access_token)},
-            status=status.HTTP_200_OK
+            {"access": str(refresh.access_token)}, status=status.HTTP_200_OK
         )

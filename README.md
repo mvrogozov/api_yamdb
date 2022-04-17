@@ -1,3 +1,4 @@
 # api_yamdb
-api_yamdb
-test
+
+api_yamdb не забыть изменить этот файл
+

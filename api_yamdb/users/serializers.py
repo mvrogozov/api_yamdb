@@ -3,23 +3,22 @@ from rest_framework import serializers
 from .models import User
 
 ROLES = (
-        ('user', 'User'),
-        ('moderator', 'Moderator'),
-        ('admin', 'Administrator'),
-        ('superuser', 'Superuser')
+    ("user", "User"),
+    ("moderator", "Moderator"),
+    ("admin", "Administrator"),
+    ("superuser", "Superuser"),
 )
 
 
 class AuthSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ("username", "email")
 
     def validate_username(self, value):
-        if value == 'me':
+        if value == "me":
             raise serializers.ValidationError(
-                'Нельзя использовать зарезервированное имя \'me\''
+                "Нельзя использовать зарезервированное имя 'me'"
             )
         return value
 
@@ -46,8 +45,8 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def validate_username(self, value):
-        if value == 'me':
+        if value == "me":
             raise serializers.ValidationError(
-                'Нельзя использовать зарезервированное имя \'me\''
+                "Нельзя использовать зарезервированное имя 'me'"
             )
         return value
