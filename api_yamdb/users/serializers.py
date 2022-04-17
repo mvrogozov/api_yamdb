@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import User
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from reviews.models import Category, Comment, Genre, Review, Title
+from .models import Category, Comment, Genre, Review, Title
 
 ROLES = (
     ("user", "User"),

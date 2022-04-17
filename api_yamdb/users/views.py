@@ -21,7 +21,7 @@ from .models import User
 
 from .api_permissions import IsAdmin
 from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
-from reviews.models import Category, Genre, Review, Title
+from .models import Category, Genre, Review, Title
 
 from .api_permissions import IsAdmin
 from .serializers import (
