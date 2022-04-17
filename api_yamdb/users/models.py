@@ -10,6 +10,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ("name",)
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=256, unique=True)
@@ -17,6 +20,9 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ("name",)
 
 
 class Title(models.Model):
@@ -35,14 +41,17 @@ class Title(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ("name",)
+
 
 class User(AbstractUser):
 
     ROLES = (
-        ('user', 'User'),
-        ('moderator', 'Moderator'),
-        ('admin', 'Administrator'),
-        ('superuser', 'Superuser')
+        ("user", "User"),
+        ("moderator", "Moderator"),
+        ("admin", "Administrator"),
+        ("superuser", "Superuser"),
     )
 
     username = models.CharField(
@@ -50,56 +59,49 @@ class User(AbstractUser):
         unique=True,
     )
     first_name = models.CharField(
-        max_length=150,
-        unique=False,
-        blank=True,
-        null=True
+        max_length=150, unique=False, blank=True, null=True
     )
     last_name = models.CharField(
-        max_length=150,
-        unique=False,
-        blank=True,
-        null=True
+        max_length=150, unique=False, blank=True, null=True
     )
 
     email = models.EmailField(max_length=254, unique=True)
     password = models.CharField(
-        max_length=150,
-        unique=False,
-        blank=True,
-        null=True
+        max_length=150, unique=False, blank=True, null=True
     )
     bio = models.TextField(
-        'Биография',
+        "Биография",
         blank=True,
         null=True,
     )
     role = models.CharField(
-        max_length=21,
-        choices=ROLES,
-        blank=True,
-        default='user'
+        max_length=21, choices=ROLES, blank=True, default="user"
     )
 
     class Meta:
         constraints = [
-            CheckConstraint(
-                check=~Q(username='me'),
-                name='name_not_me'
-            )
+            CheckConstraint(check=~Q(username="me"), name="name_not_me")
         ]
 
 
 class Review(models.Model):
     scores = (
-        ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),
-        ('6', '6'), ('7', '7'), ('8', '8'), ('9', '9'), ('10', '10')
+        ("1", "1"),
+        ("2", "2"),
+        ("3", "3"),
+        ("4", "4"),
+        ("5", "5"),
+        ("6", "6"),
+        ("7", "7"),
+        ("8", "8"),
+        ("9", "9"),
+        ("10", "10"),
     )
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews'
+        Title, on_delete=models.CASCADE, related_name="reviews"
     )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews'
+        User, on_delete=models.CASCADE, related_name="reviews"
     )
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
@@ -111,10 +113,10 @@ class Review(models.Model):
 
 class Comment(models.Model):
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments'
+        Review, on_delete=models.CASCADE, related_name="comments"
     )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments'
+        User, on_delete=models.CASCADE, related_name="comments"
     )
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)

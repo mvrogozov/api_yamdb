@@ -8,10 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -23,7 +20,9 @@ from .api_permissions import IsAdmin
 from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
 from .models import Category, Genre, Review, Title
 
-from .api_permissions import IsAdmin
+from reviews.models import Category, Genre, Review, Title, User
+from .api_permissions import IsAdmin, ReadOnly
+from .filters import TitleFilter
 from .serializers import (
     AuthSerializer,
     AuthTokenSerializer,
@@ -31,7 +30,8 @@ from .serializers import (
     CommentSerializer,
     GenreSerializer,
     ReviewSerializer,
-    TitleSerializer,
+    TitleSerializerEdit,
+    TitleSerializerSafe,
     UserSerializer,
 )
 
@@ -153,18 +153,40 @@ class CategoryViewSet(ListCreateDestroyViewSet):
         filters.SearchFilter,
     )
     search_fields = ("name",)
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdmin]
+    permission_classes = [IsAdmin]
+
+    def get_permissions(self):
+        if self.action == "list":
+            return (ReadOnly(),)
+        return super().get_permissions()
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAdmin]
+    permission_classes = [IsAdmin]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = "slug"
     filter_backends = (filters.SearchFilter,)
     search_fields = ("name",)
 
+    def get_permissions(self):
+        if self.action == "list":
+            return (ReadOnly(),)
+        return super().get_permissions()
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    filterset_class = TitleFilter
+    permission_classes = [IsAdmin]
+    filter_backends = [DjangoFilterBackend]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return (ReadOnly(),)
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action in ["post", "create", "partial_update"]:
+            return TitleSerializerEdit
+        return TitleSerializerSafe
