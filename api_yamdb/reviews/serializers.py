@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -50,16 +51,22 @@ class TitleSerializerSafe(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(read_only=True, slug_field="author")
-
+    author = SlugRelatedField(read_only=True, slug_field="username")
     class Meta:
         fields = ("id", "text", "author", "score", "pub_date")
         model = Review
-
+    
+    def validate(self, attrs):
+        title = get_object_or_404(Title, id=self.context['view'].kwargs.get("title_id"))
+        user = self.context.get('request').user
+        if Review.objects.filter(title=title, author=user).exists():
+            if self.context['request'].method in ['POST']:
+                raise serializers.ValidationError('Только один отзыв от пользователя')
+        return super().validate(attrs)
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(read_only=True, slug_field="author")
-
+    author = SlugRelatedField(read_only=True, slug_field="username")
+    
     class Meta:
         fields = ("id", "text", "author", "pub_date")
         model = Comment
