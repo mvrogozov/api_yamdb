@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters, mixins, permissions, viewsets
+
 
 from api.api_permissions import IsAdmin, ReadOnly
 from api.filters import TitleFilter
@@ -18,10 +19,23 @@ class CreateMixin(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
 class ReviewViewSet(CreateMixin, viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    model = Review
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        title = get_object_or_404(Title, id=self.kwargs.get("id"))
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
+        serializer.save(title=title, author=self.request.user)
+
+    def perform_update(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
+        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
+        queryset = review
+        serializer.save(title=title, author=self.request.user)
+        return super().perform_update(serializer)
 
 
 class CommentViewSet(CreateMixin, viewsets.ModelViewSet):
