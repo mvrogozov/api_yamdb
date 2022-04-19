@@ -68,9 +68,18 @@ class Review(models.Model):
     pub_date = models.DateTimeField(auto_now_add=True)
     score = models.IntegerField(choices=scores)
 
+    class Meta():
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_review'
+            )
+        ]
+
     def __str__(self):
         return self.text
 
+<<<<<<< HEAD
     class Meta:
 
         constraints = [
@@ -81,6 +90,8 @@ class Review(models.Model):
         ]
 
 
+=======
+>>>>>>> Lruslan
 class Comment(models.Model):
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name="comments"
