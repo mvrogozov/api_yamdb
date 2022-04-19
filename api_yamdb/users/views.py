@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken
 
 from api.api_permissions import IsAdmin
 
@@ -87,7 +87,7 @@ class AuthTokenView(APIView):
                 serializer.data, status=status.HTTP_400_BAD_REQUEST
             )
 
-        refresh = RefreshToken.for_user(user)
+        refresh = AccessToken.for_user(user)
         return Response(
             {"access": str(refresh.access_token)}, status=status.HTTP_200_OK
         )
