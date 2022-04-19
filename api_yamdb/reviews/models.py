@@ -79,7 +79,6 @@ class Review(models.Model):
     def __str__(self):
         return self.text
 
-<<<<<<< HEAD
     class Meta:
 
         constraints = [
@@ -90,8 +89,6 @@ class Review(models.Model):
         ]
 
 
-=======
->>>>>>> Lruslan
 class Comment(models.Model):
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name="comments"

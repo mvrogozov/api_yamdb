@@ -14,12 +14,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-<<<<<<< HEAD
-    model = Review
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-=======
     permission_classes = [AuthorOrReadOnly]
->>>>>>> Lruslan
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
@@ -29,7 +24,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         serializer.save(title=title, author=self.request.user)
 
-<<<<<<< HEAD
     def perform_update(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
@@ -37,8 +31,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(title=title, author=self.request.user)
         return super().perform_update(serializer)
 
-=======
->>>>>>> Lruslan
 
 class CommentViewSet( viewsets.ModelViewSet):
     serializer_class = CommentSerializer
