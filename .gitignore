@@ -149,4 +149,4 @@ dmypy.json
 media/
 
 csv_to_db.py
-api.request.http
+.api.request.http
