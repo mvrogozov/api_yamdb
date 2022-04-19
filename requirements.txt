@@ -10,7 +10,6 @@ demjson==2.2.4
 Django==2.2.16
 django-filter==21.1
 djangorestframework==3.12.4
-djangorestframework-simplejwt==5.1.0
 flake8==4.0.1
 fonttools==4.32.0
 h11==0.13.0
