@@ -76,8 +76,53 @@ POST http://127.0.0.1:8000/api/v1/categories/
 	"slug": "string"
 }
 ```
+Получение списка всех жанров:
+```
+GET http://127.0.0.1:8000/api/v1/genres/
+```
+Добавление жанра:
+```
+POST http://127.0.0.1:8000/api/v1/genres/
+{
+	"name": "string",
+	"slug": "string"
+}
 
 Получение списка всех произведений:
 ```
 GET http://127.0.0.1:8000/api/v1/titles/
 ```
+Добавление произведения:
+```
+POST http://127.0.0.1:8000/api/v1/titles/
+{
+  "name": "string",
+  "year": "int",
+  "description": "string",
+  "genre": [
+    "string"
+  ],
+  "category": "string"
+}
+```
+Получение информации о произведении:
+```
+GET http://127.0.0.1:8000/api/v1/titles/{titles_id}/
+```
+Получение списка всех отзывов:
+```
+GET http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
+```
+Получение списка всех комментариев к отзыву:
+```
+GET http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/
+```
+Получение комментария к отзыву:
+```
+GET http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
+```
+***
+Авторы:
+*Рогозов Михаил
+*Копылов Руслан
+*Худайнатова Елизавета
