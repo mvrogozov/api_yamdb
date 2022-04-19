@@ -76,7 +76,10 @@ class ReviewSerializer(serializers.ModelSerializer):
             pk=self.context['view'].kwargs.get('title_id')
         )
         user = self.context.get('request').user
-        if Review.objects.filter(title=title, author=user).exists():
+        method = self.context.get('request').method
+        if (
+            Review.objects.filter(title=title, author=user).exists()
+                and method == 'POST'):
             raise serializers.ValidationError(
                 'Только один отзыв от пользователя'
             )
@@ -85,7 +88,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(read_only=True, slug_field="username")
-    
+
     class Meta:
         fields = ("id", "text", "author", "pub_date")
         model = Comment

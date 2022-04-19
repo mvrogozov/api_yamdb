@@ -75,18 +75,10 @@ class Review(models.Model):
                 name='unique_review'
             )
         ]
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.text
-
-    class Meta:
-
-        constraints = [
-            models.UniqueConstraint(
-                fields=('title', 'author'),
-                name='unique_review'
-            )
-        ]
 
 
 class Comment(models.Model):
@@ -101,3 +93,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+    class Meta:
+
+        ordering = ('pub_date',)

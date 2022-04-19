@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, viewsets
+from rest_framework import filters, mixins, viewsets
 
 
 from api.api_permissions import IsAdmin, ReadOnly, AuthorOrReadOnly
@@ -10,7 +10,7 @@ from .models import Category, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleSerializerEdit, TitleSerializerSafe)
-                          
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
@@ -24,15 +24,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         serializer.save(title=title, author=self.request.user)
 
-    def perform_update(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
-        review = get_object_or_404(Review, id=self.kwargs.get("review_id"))
-        queryset = review
-        serializer.save(title=title, author=self.request.user)
-        return super().perform_update(serializer)
 
-
-class CommentViewSet( viewsets.ModelViewSet):
+class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [AuthorOrReadOnly]
 
