@@ -5,7 +5,7 @@ class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, obj):
         if request.user.is_anonymous:
             return False
-        return request.user.role == "admin" or request.user.is_superuser
+        return request.user.role == 'admin' or request.user.is_superuser
 
 
 class ReadOnly(permissions.BasePermission):
@@ -28,5 +28,5 @@ class AuthorOrReadOnly(permissions.BasePermission):
             return False
         return (
             obj.author == request.user
-            or request.user.role in ["moderator", "admin", "superuser"]
+            or request.user.role in ['moderator', 'admin', 'superuser']
         )

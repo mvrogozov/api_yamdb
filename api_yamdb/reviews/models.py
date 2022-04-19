@@ -11,7 +11,7 @@ class Category(models.Model):
         return self.name
 
     class Meta:
-        ordering = ("name",)
+        ordering = ('name',)
 
 
 class Genre(models.Model):
@@ -22,27 +22,27 @@ class Genre(models.Model):
         return self.name
 
     class Meta:
-        ordering = ("name",)
+        ordering = ('name',)
 
 
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
     description = models.TextField()
-    genre = models.ManyToManyField(Genre, related_name="titles")
+    genre = models.ManyToManyField(Genre, related_name='titles')
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="titles",
+        related_name='titles',
     )
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ("name",)
+        ordering = ('name',)
 
 
 class Review(models.Model):
@@ -59,10 +59,10 @@ class Review(models.Model):
         (10, 10),
     )
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name="reviews"
+        Title, on_delete=models.CASCADE, related_name='reviews'
     )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviews"
+        User, on_delete=models.CASCADE, related_name='reviews'
     )
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
@@ -83,10 +83,10 @@ class Review(models.Model):
 
 class Comment(models.Model):
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name="comments"
+        Review, on_delete=models.CASCADE, related_name='comments'
     )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="comments"
+        User, on_delete=models.CASCADE, related_name='comments'
     )
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
