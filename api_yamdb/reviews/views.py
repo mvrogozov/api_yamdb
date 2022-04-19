@@ -1,11 +1,12 @@
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters, viewsets
 
-
-from api.api_permissions import IsAdmin, ReadOnly, AuthorOrReadOnly
+from api.api_permissions import AuthorOrReadOnly, IsAdmin, ReadOnly
 from api.filters import TitleFilter
 
+from .api_mixins import ListCreateDestroyViewSet
 from .models import Category, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
@@ -38,16 +39,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(review=review, author=self.request.user)
 
 
-class ListCreateDestroyViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet,
-):
-
-    pass
-
-
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -59,11 +50,6 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     search_fields = ('name',)
     permission_classes = [IsAdmin]
 
-    def get_permissions(self):
-        if self.action == 'list':
-            return (ReadOnly(),)
-        return super().get_permissions()
-
 
 class GenreViewSet(ListCreateDestroyViewSet):
     permission_classes = [IsAdmin]
@@ -73,14 +59,14 @@ class GenreViewSet(ListCreateDestroyViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
-    def get_permissions(self):
-        if self.action == 'list':
-            return (ReadOnly(),)
-        return super().get_permissions()
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = (
+        Title.objects.all().annotate(
+            rating=Avg('reviews__score')
+        ).order_by('name')
+    )
     filterset_class = TitleFilter
     permission_classes = [IsAdmin]
     filter_backends = [DjangoFilterBackend]

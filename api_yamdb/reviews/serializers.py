@@ -1,19 +1,21 @@
+import datetime
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from django.db.models import Avg
+
 from .models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id',)
         model = Genre
 
 
@@ -24,23 +26,19 @@ class TitleSerializerEdit(serializers.ModelSerializer):
     category = SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all()
     )
-    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category', 'rating'
+            'id', 'name', 'year', 'description', 'genre', 'category'
         )
         read_only_fields = ('id',)
-
-    def get_rating(self, obj):
-        return obj.reviews.aggregate(Avg('score'))
 
 
 class TitleSerializerSafe(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True, many=False)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.FloatField()
 
     class Meta:
         model = Title
@@ -55,8 +53,9 @@ class TitleSerializerSafe(serializers.ModelSerializer):
         )
         read_only_fields = ('id', 'rating', 'genre', 'category')
 
-    def get_rating(self, obj):
-        return obj.reviews.aggregate(Avg('score'))['score__avg']
+    def validate_year(self, value):
+        if value > datetime.datetime.now():
+            raise serializers.ValidationError('Wrong year')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -69,6 +68,11 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
+
+    def validate_score(self, value):
+        if 0 <= value <= 10:
+            return value
+        return serializers.ValidationError('Wrong score')
 
     def validate(self, attrs):
         title = get_object_or_404(

@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from reviews.views import (CategoryViewSet, CommentViewSet, GenreViewSet,
                            ReviewViewSet, TitleViewSet)
-from users.views import AuthTokenView, AuthView, MeView, UserViewSet
+from users.views import AuthTokenView, AuthView, UserViewSet
 
 API_VERSION = 'v1/'
 
@@ -21,8 +21,9 @@ router.register(
 )
 router.register('titles', TitleViewSet, basename='title')
 
+#path(API_VERSION + 'users/me/', MeView.as_view(), name='api_users_me'),
 urlpatterns = [
-    path(API_VERSION + 'users/me/', MeView.as_view(), name='api_users_me'),
+    
     path(API_VERSION, include(router.urls)),
     path(
         API_VERSION + 'auth/signup/',

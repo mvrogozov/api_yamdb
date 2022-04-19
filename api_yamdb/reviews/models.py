@@ -1,33 +1,47 @@
+from datetime import datetime
+
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.forms import ValidationError
 
 from users.models import User
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=256, unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
+def year_validator(value):
+    if value > datetime.now().year:
+        raise ValidationError(
+            ('Wrong year!'),
+            params={'value': value},
+        )
 
-    def __str__(self):
-        return self.name
+
+class Category(models.Model):
+    name = models.CharField(max_length=256, unique=True, db_index=True)
+    slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256, unique=True)
+    name = models.CharField(max_length=256, unique=True, db_index=True)
     slug = models.SlugField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         ordering = ('name',)
 
+    def __str__(self):
+        return self.name
+
 
 class Title(models.Model):
-    name = models.CharField(max_length=256)
-    year = models.IntegerField()
+    name = models.CharField(max_length=256, db_index=True)
+    year = models.IntegerField(
+        validators=[year_validator, ]
+    )
     description = models.TextField()
     genre = models.ManyToManyField(Genre, related_name='titles')
     category = models.ForeignKey(
@@ -38,11 +52,11 @@ class Title(models.Model):
         related_name='titles',
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):
@@ -66,7 +80,13 @@ class Review(models.Model):
     )
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
-    score = models.IntegerField(choices=scores)
+    score = models.IntegerField(
+        choices=scores,
+        validators=[
+            MaxValueValidator(10, 'Value error'),
+            MinValueValidator(0, 'Value error'),
+        ]
+    )
 
     class Meta():
         constraints = [
@@ -91,9 +111,9 @@ class Comment(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.text
-
     class Meta:
 
         ordering = ('pub_date',)
+
+    def __str__(self):
+        return self.text

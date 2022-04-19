@@ -2,30 +2,37 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CheckConstraint, Q
 
+ROLE_DICT = {
+    'USER': 'user',
+    'MODER': 'moderator',
+    'ADMIN': 'admin',
+}
+
 
 class User(AbstractUser):
 
     ROLES = (
-        ('user', 'User'),
-        ('moderator', 'Moderator'),
-        ('admin', 'Administrator'),
-        ('superuser', 'Superuser'),
+        (ROLE_DICT['USER'], 'User'),
+        (ROLE_DICT['MODER'], 'Moderator'),
+        (ROLE_DICT['ADMIN'], 'Administrator'),
     )
 
     username = models.CharField(
+        'username',
         max_length=150,
         unique=True,
+        db_index=True
     )
     first_name = models.CharField(
-        max_length=150, unique=False, blank=True, null=True
+        'Имя', max_length=150, unique=False, blank=True, null=True
     )
     last_name = models.CharField(
-        max_length=150, unique=False, blank=True, null=True
+        'Фамилия', max_length=150, unique=False, blank=True, null=True
     )
 
-    email = models.EmailField(max_length=254, unique=True)
+    email = models.EmailField('email', max_length=254, unique=True)
     password = models.CharField(
-        max_length=150, unique=False, blank=True, null=True
+        'Пароль', max_length=150, unique=False, blank=True, null=True
     )
     bio = models.TextField(
         'Биография',
@@ -33,10 +40,25 @@ class User(AbstractUser):
         null=True,
     )
     role = models.CharField(
-        max_length=21, choices=ROLES, blank=True, default='user'
+        'Роль', max_length=21, choices=ROLES, blank=True, default='user'
     )
 
     class Meta:
+
+        verbose_name = 'user'
+        verbose_name_plural = 'users'
         constraints = [
             CheckConstraint(check=~Q(username='me'), name='name_not_me')
         ]
+
+    @property
+    def is_admin(self):
+        return self.role == ROLE_DICT['ADMIN']
+
+    @property
+    def is_moder(self):
+        return self.role == ROLE_DICT['MODER']
+
+    @property
+    def is_user(self):
+        return self.role == ROLE_DICT['USER']
