@@ -58,13 +58,13 @@ class AuthView(APIView):
         serializer = AuthSerializer(data=request.data)
         if serializer.is_valid():
             confirmation_code = urlsafe_base64_encode(
-                force_bytes(serializer.validated_data.get("username"))
+                force_bytes(serializer.validated_data.get('username'))
             )
             send_mail(
-                "subj",
+                'subj',
                 confirmation_code,
-                "from@django.com",
-                [serializer.validated_data.get("email")],
+                'from@django.com',
+                [serializer.validated_data.get('email')],
                 fail_silently=True,
             )
             serializer.save()
@@ -82,12 +82,12 @@ class AuthTokenView(APIView):
         username = serializer.data.get('username')
         user = get_object_or_404(User, username=username)
         right_code = urlsafe_base64_encode(force_bytes(username))
-        if serializer.data.get("confirmation_code") != right_code:
+        if serializer.data.get('confirmation_code') != right_code:
             return Response(
                 serializer.data, status=status.HTTP_400_BAD_REQUEST
             )
 
         refresh = AccessToken.for_user(user)
         return Response(
-            {"access": str(refresh.access_token)}, status=status.HTTP_200_OK
+            {'access': str(refresh.access_token)}, status=status.HTTP_200_OK
         )
