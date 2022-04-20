@@ -64,6 +64,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ('author', 'review', 'pub_date')
     empty_value_display = '-пусто-'
 
+
 admin.site.register(Title, TitleAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Genre, GenreAdmin)
