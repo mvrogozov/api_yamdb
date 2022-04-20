@@ -3,11 +3,10 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 
-from api.api_permissions import AuthorOrReadOnly, IsAdmin, ReadOnly
+from api.api_permissions import AuthorOrReadOnly, IsAdminOrReadOnly
 from api.filters import TitleFilter
-
+from reviews.models import Category, Genre, Review, Title
 from .api_mixins import ListCreateDestroyViewSet
-from .models import Category, Genre, Review, Title
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleSerializerEdit, TitleSerializerSafe)
@@ -48,11 +47,11 @@ class CategoryViewSet(ListCreateDestroyViewSet):
         filters.SearchFilter,
     )
     search_fields = ('name',)
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     lookup_field = 'slug'
@@ -67,13 +66,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         ).order_by('name')
     )
     filterset_class = TitleFilter
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend]
-
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return (ReadOnly(),)
-        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ['post', 'create', 'partial_update']:

@@ -1,14 +1,7 @@
 from rest_framework import serializers
 
 from .models import User
-
-
-def is_me(value):
-    if value == 'me':
-        raise serializers.ValidationError(
-            'Нельзя использовать зарезервированное имя "me"'
-        )
-    return value
+from .utils import is_me
 
 
 class AuthSerializer(serializers.ModelSerializer):
@@ -28,7 +21,7 @@ class AuthTokenSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
 
-    role = serializers.ChoiceField(choices=User.ROLES, default='user')
+    role = serializers.ChoiceField(choices=User.ROLES, default=User.USER)
 
     class Meta:
         model = User

@@ -2,19 +2,17 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CheckConstraint, Q
 
-ROLE_DICT = {
-    'USER': 'user',
-    'MODER': 'moderator',
-    'ADMIN': 'admin',
-}
-
 
 class User(AbstractUser):
 
+    USER = 'user'
+    MODER = 'moderator'
+    ADMIN = 'admin'
+
     ROLES = (
-        (ROLE_DICT['USER'], 'User'),
-        (ROLE_DICT['MODER'], 'Moderator'),
-        (ROLE_DICT['ADMIN'], 'Administrator'),
+        (USER, 'User'),
+        (MODER, 'Moderator'),
+        (ADMIN, 'Administrator'),
     )
 
     username = models.CharField(
@@ -53,12 +51,12 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == ROLE_DICT['ADMIN']
+        return self.role == self.ADMIN
 
     @property
     def is_moder(self):
-        return self.role == ROLE_DICT['MODER']
+        return self.role == self.MODER
 
     @property
     def is_user(self):
-        return self.role == ROLE_DICT['USER']
+        return self.role == self.USER

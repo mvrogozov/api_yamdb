@@ -1,18 +1,8 @@
-from datetime import datetime
-
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.forms import ValidationError
 
 from users.models import User
-
-
-def year_validator(value):
-    if value > datetime.now().year:
-        raise ValidationError(
-            ('Wrong year!'),
-            params={'value': value},
-        )
+from .validators import year_validator
 
 
 class Category(models.Model):
@@ -60,18 +50,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    scores = (
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-        (5, 5),
-        (6, 6),
-        (7, 7),
-        (8, 8),
-        (9, 9),
-        (10, 10),
-    )
+
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='reviews'
     )
@@ -81,7 +60,6 @@ class Review(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField(auto_now_add=True)
     score = models.IntegerField(
-        choices=scores,
         validators=[
             MaxValueValidator(10, 'Value error'),
             MinValueValidator(0, 'Value error'),

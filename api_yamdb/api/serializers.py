@@ -1,10 +1,9 @@
-import datetime
-
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from .models import Category, Comment, Genre, Review, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -35,7 +34,7 @@ class TitleSerializerEdit(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
     def validate_year(self, value):
-        if value > datetime.datetime.now().year:
+        if value > timezone.now().year:
             raise serializers.ValidationError('Wrong year')
         return value
 

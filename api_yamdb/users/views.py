@@ -13,7 +13,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.api_permissions import IsAdmin
-
 from .models import User
 from .serializers import AuthSerializer, AuthTokenSerializer, UserSerializer
 
@@ -46,30 +45,30 @@ class UserViewSet(ModelViewSet):
         serializer = UserSerializer(
             instance=user, data=request.data, partial=True
         )
-        if serializer.is_valid(raise_exception=True):
-            if request.user.is_superuser or request.user.is_admin:
-                serializer.save()
-            else:
-                serializer.save(role=request.user.role)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
+        if request.user.is_superuser or request.user.is_admin:
+            serializer.save()
+        else:
+            serializer.save(role=request.user.role)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AuthView(APIView):
     def post(self, request):
         serializer = AuthSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            confirmation_code = urlsafe_base64_encode(
-                force_bytes(serializer.validated_data.get('username'))
-            )
-            send_mail(
-                'subj',
-                confirmation_code,
-                settings.ADMIN_EMAIL,
-                [serializer.validated_data.get('email')],
-                fail_silently=True,
-            )
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
+        confirmation_code = urlsafe_base64_encode(
+            force_bytes(serializer.validated_data.get('username'))
+        )
+        send_mail(
+            'subj',
+            confirmation_code,
+            settings.ADMIN_EMAIL,
+            [serializer.validated_data.get('email')],
+            fail_silently=True,
+        )
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AuthTokenView(APIView):
