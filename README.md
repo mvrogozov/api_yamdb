@@ -122,6 +122,11 @@ GET http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/
 GET http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
 ```
 ***
+## Документация к API:
+```
+http://127.0.0.1:8000/redoc/
+```
+***
 Авторы:
 * Рогозов Михаил
 * Копылов Руслан

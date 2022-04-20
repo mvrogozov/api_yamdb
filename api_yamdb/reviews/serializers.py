@@ -1,5 +1,5 @@
 import datetime
-from django.db.models import Avg
+
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
@@ -34,6 +34,11 @@ class TitleSerializerEdit(serializers.ModelSerializer):
         )
         read_only_fields = ('id',)
 
+    def validate_year(self, value):
+        if value > datetime.datetime.now().year:
+            raise serializers.ValidationError('Wrong year')
+        return value
+
 
 class TitleSerializerSafe(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
@@ -52,10 +57,6 @@ class TitleSerializerSafe(serializers.ModelSerializer):
             'category',
         )
         read_only_fields = ('id', 'rating', 'genre', 'category')
-
-    def validate_year(self, value):
-        if value > datetime.datetime.now():
-            raise serializers.ValidationError('Wrong year')
 
 
 class ReviewSerializer(serializers.ModelSerializer):

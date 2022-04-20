@@ -21,9 +21,7 @@ router.register(
 )
 router.register('titles', TitleViewSet, basename='title')
 
-#path(API_VERSION + 'users/me/', MeView.as_view(), name='api_users_me'),
 urlpatterns = [
-    
     path(API_VERSION, include(router.urls)),
     path(
         API_VERSION + 'auth/signup/',

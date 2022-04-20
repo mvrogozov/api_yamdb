@@ -2,11 +2,12 @@ from rest_framework import serializers
 
 from .models import User
 
+
 def is_me(value):
     if value == 'me':
-            raise serializers.ValidationError(
-                'Нельзя использовать зарезервированное имя "me"'
-            )
+        raise serializers.ValidationError(
+            'Нельзя использовать зарезервированное имя "me"'
+        )
     return value
 
 

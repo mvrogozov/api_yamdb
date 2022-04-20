@@ -60,7 +60,6 @@ class GenreViewSet(ListCreateDestroyViewSet):
     search_fields = ('name',)
 
 
-
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = (
         Title.objects.all().annotate(
