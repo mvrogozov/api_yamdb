@@ -42,6 +42,12 @@ python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+Перейти в папку api_yamdb
+
+```
+cd api_yamdb
+```
+
 Выполнить миграции:
 
 ```
@@ -54,7 +60,7 @@ python3 manage.py migrate
 python3 manage.py runserver
 ```
 
-##Алгоритм регистрации пользователей
+## Алгоритм регистрации пользователей
 ***
 1. Пользователь отправляет POST-запрос на добавление нового пользователя с параметрами email и username на эндпоинт ```/api/v1/auth/signup/```
 
